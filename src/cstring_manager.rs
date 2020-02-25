@@ -19,7 +19,7 @@ impl List {
         ptr
     }
 
-    fn add(&mut self, value: *mut c_void){
+    fn add(&mut self, value: *mut c_void) {
         let old = self.next;
         let new = List::new(value, old);
         self.next = new;
@@ -45,11 +45,11 @@ impl CStringManager {
 
         let ptr = unsafe {
             // malloc
-            let buf : *mut c_void = libc::malloc(string.len() + 1);
+            let buf: *mut c_void = libc::malloc(string.len() + 1);
             INSTANCE.add(buf);
 
             // init
-            let mut p = buf as *mut i8;
+            let p = buf as *mut i8;
             let bytes = string.as_bytes();
             let len = bytes.len();
             for i in 0..len {
@@ -63,17 +63,17 @@ impl CStringManager {
         ptr
     }
 
-    fn add(&mut self, cstring: *mut c_void){
+    fn add(&mut self, cstring: *mut c_void) {
         if self.cstrings.is_null() {
             self.cstrings = List::new(cstring, 0 as *mut List);
-        }else{
+        } else {
             unsafe { (*self.cstrings).add(cstring) };
         }
     }
 }
 
 impl Drop for CStringManager {
-    fn drop(&mut self){
+    fn drop(&mut self) {
         let mut list: *mut List = unsafe { &mut *self.cstrings };
         unsafe {
             while !list.is_null() {

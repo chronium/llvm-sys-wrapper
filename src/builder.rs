@@ -6,26 +6,26 @@ use self::llvm_sys::core::*;
 use self::llvm_sys::prelude::*;
 use self::llvm_sys::LLVMIntPredicate::*;
 use self::llvm_sys::LLVMRealPredicate::*;
-use phi::Phi;
 use cstring_manager::CStringManager;
+use phi::Phi;
 
 #[derive(Debug)]
 pub struct Builder {
-    llvm_builder: LLVMBuilderRef
+    llvm_builder: LLVMBuilderRef,
 }
 
 impl Builder {
     pub fn new() -> Builder {
         let builder = unsafe { LLVMCreateBuilder() };
         Builder {
-            llvm_builder: builder
+            llvm_builder: builder,
         }
     }
 
     pub fn new_in_context(context: LLVMContextRef) -> Builder {
         let builder = unsafe { LLVMCreateBuilderInContext(context) };
         Builder {
-            llvm_builder: builder
+            llvm_builder: builder,
         }
     }
 
@@ -34,8 +34,10 @@ impl Builder {
     }
 
     #[inline]
-    pub fn position_at_end(&self, entry_block: LLVMBasicBlockRef){
-        unsafe { LLVMPositionBuilderAtEnd(self.llvm_builder, entry_block); }
+    pub fn position_at_end(&self, entry_block: LLVMBasicBlockRef) {
+        unsafe {
+            LLVMPositionBuilderAtEnd(self.llvm_builder, entry_block);
+        }
     }
 
     #[inline]
@@ -55,7 +57,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_array_alloca_with_name(&self, typ: LLVMTypeRef, size: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_array_alloca_with_name(
+        &self,
+        typ: LLVMTypeRef,
+        size: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildArrayAlloca(self.llvm_builder, typ, size, val_name_ptr) }
     }
@@ -66,7 +73,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_array_malloc_with_name(&self, typ: LLVMTypeRef, size: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_array_malloc_with_name(
+        &self,
+        typ: LLVMTypeRef,
+        size: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildArrayMalloc(self.llvm_builder, typ, size, val_name_ptr) }
     }
@@ -82,7 +94,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_struct_gep_with_name(&self, ptr: LLVMValueRef, index: u32, name: &str) -> LLVMValueRef {
+    pub fn build_struct_gep_with_name(
+        &self,
+        ptr: LLVMValueRef,
+        index: u32,
+        name: &str,
+    ) -> LLVMValueRef {
         unsafe { LLVMBuildStructGEP(self.llvm_builder, ptr, index, name.as_ptr() as *const i8) }
     }
 
@@ -103,12 +120,23 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_select(&self, cond: LLVMValueRef, then_val: LLVMValueRef, else_val: LLVMValueRef) -> LLVMValueRef {
+    pub fn build_select(
+        &self,
+        cond: LLVMValueRef,
+        then_val: LLVMValueRef,
+        else_val: LLVMValueRef,
+    ) -> LLVMValueRef {
         self.build_select_with_name(cond, then_val, else_val, "")
     }
 
     #[inline]
-    pub fn build_select_with_name(&self, cond: LLVMValueRef, then_val: LLVMValueRef, else_val: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_select_with_name(
+        &self,
+        cond: LLVMValueRef,
+        then_val: LLVMValueRef,
+        else_val: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildSelect(self.llvm_builder, cond, then_val, else_val, val_name_ptr) }
     }
@@ -119,7 +147,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_int_to_ptr_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_int_to_ptr_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildIntToPtr(self.llvm_builder, val, to_type, val_name_ptr) }
     }
@@ -130,7 +163,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_ptr_to_int_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_ptr_to_int_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildPtrToInt(self.llvm_builder, val, to_type, val_name_ptr) }
     }
@@ -141,7 +179,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_bitcast_with_name(&self, value: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_bitcast_with_name(
+        &self,
+        value: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildBitCast(self.llvm_builder, value, to_type, val_name_ptr) }
     }
@@ -152,7 +195,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_zext_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_zext_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildZExt(self.llvm_builder, val, to_type, val_name_ptr) }
     }
@@ -163,7 +211,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_trunc_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_trunc_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildTrunc(self.llvm_builder, val, to_type, val_name_ptr) }
     }
@@ -174,7 +227,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fp_trunc_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_fp_trunc_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFPTrunc(self.llvm_builder, val, to_type, val_name_ptr) }
     }
@@ -185,20 +243,36 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_trunc_or_bitcast_with_name(&self, val: LLVMValueRef, to_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_trunc_or_bitcast_with_name(
+        &self,
+        val: LLVMValueRef,
+        to_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildTruncOrBitCast(self.llvm_builder, val, to_type, val_name_ptr) }
     }
 
     #[inline]
-    pub fn build_insert_value(&self, agg_val: LLVMValueRef, elt_val: LLVMValueRef, index: u32) -> LLVMValueRef {
+    pub fn build_insert_value(
+        &self,
+        agg_val: LLVMValueRef,
+        elt_val: LLVMValueRef,
+        index: u32,
+    ) -> LLVMValueRef {
         self.build_insert_value_with_name(agg_val, elt_val, index, "")
     }
 
     #[inline]
-    pub fn build_insert_value_with_name(&self, agg_val: LLVMValueRef, elt_val: LLVMValueRef, index: u32, name: &str) -> LLVMValueRef {
+    pub fn build_insert_value_with_name(
+        &self,
+        agg_val: LLVMValueRef,
+        elt_val: LLVMValueRef,
+        index: u32,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildInsertValue(self.llvm_builder, agg_val, elt_val, index, val_name_ptr)}
+        unsafe { LLVMBuildInsertValue(self.llvm_builder, agg_val, elt_val, index, val_name_ptr) }
     }
 
     #[inline]
@@ -207,9 +281,14 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_extract_value_with_name(&self, agg_val: LLVMValueRef, index: u32, name: &str) -> LLVMValueRef {
+    pub fn build_extract_value_with_name(
+        &self,
+        agg_val: LLVMValueRef,
+        index: u32,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildExtractValue(self.llvm_builder, agg_val, index, val_name_ptr)}
+        unsafe { LLVMBuildExtractValue(self.llvm_builder, agg_val, index, val_name_ptr) }
     }
 
     #[inline]
@@ -218,9 +297,30 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_add_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_add_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildAdd(self.llvm_builder, lhs, rhs, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fadd(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
+        self.build_fadd_with_name(lhs, rhs, "")
+    }
+
+    #[inline]
+    pub fn build_fadd_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFAdd(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
 
     #[inline]
@@ -229,9 +329,30 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_sub_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_sub_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildSub(self.llvm_builder, lhs, rhs, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fsub(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
+        self.build_fsub_with_name(lhs, rhs, "")
+    }
+
+    #[inline]
+    pub fn build_fsub_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFSub(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
 
     #[inline]
@@ -240,9 +361,30 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_mul_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_mul_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildMul(self.llvm_builder, lhs, rhs, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fmul(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
+        self.build_fmul_with_name(lhs, rhs, "")
+    }
+
+    #[inline]
+    pub fn build_fmul_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFMul(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
 
     #[inline]
@@ -251,9 +393,30 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_sdiv_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_sdiv_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildSDiv(self.llvm_builder, lhs, rhs, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fdiv(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
+        self.build_fdiv_with_name(lhs, rhs, "")
+    }
+
+    #[inline]
+    pub fn build_fdiv_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFDiv(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
 
     #[inline]
@@ -262,7 +425,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_udiv_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_udiv_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildUDiv(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -273,9 +441,30 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_srem_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_srem_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildSRem(self.llvm_builder, lhs, rhs, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_frem(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
+        self.build_frem_with_name(lhs, rhs, "")
+    }
+
+    #[inline]
+    pub fn build_frem_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFRem(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
 
     #[inline]
@@ -284,7 +473,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_urem_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_urem_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildURem(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -305,7 +499,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_and_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_and_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildAnd(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -316,7 +515,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_or_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_or_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildOr(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -327,7 +531,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_xor_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_xor_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildXor(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -360,7 +569,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_shl_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_shl_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildShl(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -371,7 +585,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_ashr_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_ashr_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildAShr(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -382,7 +601,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_lshr_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_lshr_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildLShr(self.llvm_builder, lhs, rhs, val_name_ptr) }
     }
@@ -415,7 +639,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_eq_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_eq_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntEQ, lhs, rhs, val_name_ptr) }
     }
@@ -426,7 +655,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_ne_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_ne_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntNE, lhs, rhs, val_name_ptr) }
     }
@@ -437,7 +671,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_ugt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_ugt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntUGT, lhs, rhs, val_name_ptr) }
     }
@@ -448,7 +687,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_uge_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_uge_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntUGE, lhs, rhs, val_name_ptr) }
     }
@@ -459,7 +703,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_ult_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_ult_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntULT, lhs, rhs, val_name_ptr) }
     }
@@ -470,7 +719,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_ule_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_ule_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntULE, lhs, rhs, val_name_ptr) }
     }
@@ -481,7 +735,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_sgt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_sgt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntSGT, lhs, rhs, val_name_ptr) }
     }
@@ -492,7 +751,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_sge_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_sge_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntSGE, lhs, rhs, val_name_ptr) }
     }
@@ -503,7 +767,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_slt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_slt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntSLT, lhs, rhs, val_name_ptr) }
     }
@@ -514,7 +783,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_icmp_sle_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_icmp_sle_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildICmp(self.llvm_builder, LLVMIntSLE, lhs, rhs, val_name_ptr) }
     }
@@ -525,9 +799,22 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_predicate_false_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_predicate_false_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealPredicateFalse, lhs, rhs, val_name_ptr) }
+        unsafe {
+            LLVMBuildFCmp(
+                self.llvm_builder,
+                LLVMRealPredicateFalse,
+                lhs,
+                rhs,
+                val_name_ptr,
+            )
+        }
     }
 
     #[inline]
@@ -536,9 +823,22 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_predicate_true_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_predicate_true_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealPredicateTrue, lhs, rhs, val_name_ptr) }
+        unsafe {
+            LLVMBuildFCmp(
+                self.llvm_builder,
+                LLVMRealPredicateTrue,
+                lhs,
+                rhs,
+                val_name_ptr,
+            )
+        }
     }
 
     #[inline]
@@ -547,7 +847,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ord_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ord_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealORD, lhs, rhs, val_name_ptr) }
     }
@@ -558,7 +863,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_oeq_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_oeq_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealOEQ, lhs, rhs, val_name_ptr) }
     }
@@ -569,7 +879,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_one_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_one_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealONE, lhs, rhs, val_name_ptr) }
     }
@@ -580,7 +895,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ogt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ogt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealOGT, lhs, rhs, val_name_ptr) }
     }
@@ -591,7 +911,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_oge_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_oge_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealOGE, lhs, rhs, val_name_ptr) }
     }
@@ -602,7 +927,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_olt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_olt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealOLT, lhs, rhs, val_name_ptr) }
     }
@@ -613,7 +943,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ole_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ole_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealOLE, lhs, rhs, val_name_ptr) }
     }
@@ -624,7 +959,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_uno_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_uno_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealUNO, lhs, rhs, val_name_ptr) }
     }
@@ -635,7 +975,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ueq_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ueq_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealUEQ, lhs, rhs, val_name_ptr) }
     }
@@ -646,7 +991,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_une_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_une_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealUNE, lhs, rhs, val_name_ptr) }
     }
@@ -657,7 +1007,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ugt_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ugt_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealUGT, lhs, rhs, val_name_ptr) }
     }
@@ -668,7 +1023,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_uge_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_uge_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealUGE, lhs, rhs, val_name_ptr) }
     }
@@ -679,7 +1039,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ult_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ult_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealULT, lhs, rhs, val_name_ptr) }
     }
@@ -690,7 +1055,12 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_fcmp_ule_with_name(&self, lhs: LLVMValueRef, rhs: LLVMValueRef, name: &str) -> LLVMValueRef {
+    pub fn build_fcmp_ule_with_name(
+        &self,
+        lhs: LLVMValueRef,
+        rhs: LLVMValueRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildFCmp(self.llvm_builder, LLVMRealULE, lhs, rhs, val_name_ptr) }
     }
@@ -708,26 +1078,50 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_call(&self, func: LLVMValueRef, params:  &mut [LLVMValueRef]) -> LLVMValueRef {
+    pub fn build_call(&self, func: LLVMValueRef, params: &mut [LLVMValueRef]) -> LLVMValueRef {
         self.build_call_with_name(func, params, "")
     }
 
     #[inline]
-    pub fn build_call_with_name(&self, func: LLVMValueRef, params:  &mut [LLVMValueRef], name: &str) -> LLVMValueRef {
-        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildCall(self.llvm_builder, func, params.as_mut_ptr(), params.len() as u32, val_name_ptr) }
-    }
-
-    #[inline]
-    pub fn build_tail_call(&self, func: LLVMValueRef, params:  &mut [LLVMValueRef]) -> LLVMValueRef {
-       self.build_tail_call_with_name(func, params, "")
-    }
-
-    #[inline]
-    pub fn build_tail_call_with_name(&self, func: LLVMValueRef, params:  &mut [LLVMValueRef], name: &str) -> LLVMValueRef {
+    pub fn build_call_with_name(
+        &self,
+        func: LLVMValueRef,
+        params: &mut [LLVMValueRef],
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe {
-            let call = LLVMBuildCall(self.llvm_builder, func, params.as_mut_ptr(), params.len() as u32, val_name_ptr);
+            LLVMBuildCall(
+                self.llvm_builder,
+                func,
+                params.as_mut_ptr(),
+                params.len() as u32,
+                val_name_ptr,
+            )
+        }
+    }
+
+    #[inline]
+    pub fn build_tail_call(&self, func: LLVMValueRef, params: &mut [LLVMValueRef]) -> LLVMValueRef {
+        self.build_tail_call_with_name(func, params, "")
+    }
+
+    #[inline]
+    pub fn build_tail_call_with_name(
+        &self,
+        func: LLVMValueRef,
+        params: &mut [LLVMValueRef],
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe {
+            let call = LLVMBuildCall(
+                self.llvm_builder,
+                func,
+                params.as_mut_ptr(),
+                params.len() as u32,
+                val_name_ptr,
+            );
             LLVMSetTailCall(call, 1); // set tail call opt
             call
         }
@@ -739,12 +1133,22 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_cond_br(&self, condition: LLVMValueRef, then_block: LLVMBasicBlockRef, else_block: LLVMBasicBlockRef) -> LLVMValueRef {
+    pub fn build_cond_br(
+        &self,
+        condition: LLVMValueRef,
+        then_block: LLVMBasicBlockRef,
+        else_block: LLVMBasicBlockRef,
+    ) -> LLVMValueRef {
         unsafe { LLVMBuildCondBr(self.llvm_builder, condition, then_block, else_block) }
     }
 
     #[inline]
-    pub fn build_switch(&self, value: LLVMValueRef, default: LLVMBasicBlockRef, cases: &[(LLVMValueRef, LLVMBasicBlockRef)]) -> LLVMValueRef {
+    pub fn build_switch(
+        &self,
+        value: LLVMValueRef,
+        default: LLVMBasicBlockRef,
+        cases: &[(LLVMValueRef, LLVMBasicBlockRef)],
+    ) -> LLVMValueRef {
         unsafe {
             let switch = LLVMBuildSwitch(self.llvm_builder, value, default, cases.len() as u32);
             for case in cases {
@@ -760,20 +1164,42 @@ impl Builder {
     }
 
     #[inline]
-    pub fn build_sext_with_name(&self, value: LLVMValueRef, dest_type: LLVMTypeRef, name: &str) -> LLVMValueRef {
+    pub fn build_sext_with_name(
+        &self,
+        value: LLVMValueRef,
+        dest_type: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
         unsafe { LLVMBuildSExt(self.llvm_builder, value, dest_type, val_name_ptr) }
     }
 
     #[inline]
-    pub fn build_inbounds_gep(&self, target: LLVMValueRef, indices: &mut [LLVMValueRef]) -> LLVMValueRef {
+    pub fn build_inbounds_gep(
+        &self,
+        target: LLVMValueRef,
+        indices: &mut [LLVMValueRef],
+    ) -> LLVMValueRef {
         self.build_inbounds_gep_with_name(target, indices, "")
     }
 
     #[inline]
-    pub fn build_inbounds_gep_with_name(&self, target: LLVMValueRef, indices: &mut [LLVMValueRef], name: &str) -> LLVMValueRef {
+    pub fn build_inbounds_gep_with_name(
+        &self,
+        target: LLVMValueRef,
+        indices: &mut [LLVMValueRef],
+        name: &str,
+    ) -> LLVMValueRef {
         let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
-        unsafe { LLVMBuildInBoundsGEP(self.llvm_builder, target, indices.as_mut_ptr(), indices.len() as u32, val_name_ptr) }
+        unsafe {
+            LLVMBuildInBoundsGEP(
+                self.llvm_builder,
+                target,
+                indices.as_mut_ptr(),
+                indices.len() as u32,
+                val_name_ptr,
+            )
+        }
     }
 
     #[inline]
