@@ -4,15 +4,15 @@ extern crate llvm_sys;
 
 use self::llvm_sys::core::*;
 use self::llvm_sys::prelude::*;
-use std::os::raw::c_uint;
-use LLVM::Type;
 use builder::Builder;
 use module::Module;
+use std::os::raw::c_uint;
 use struct_type::Struct;
+use LLVM::Type;
 
 #[derive(Debug)]
 pub struct Context {
-    llvm_context: LLVMContextRef
+    llvm_context: LLVMContextRef,
 }
 
 #[allow(non_snake_case)]
@@ -20,21 +20,21 @@ impl Context {
     pub fn global_context() -> Context {
         let context = unsafe { LLVMGetGlobalContext() };
         Context {
-            llvm_context: context
+            llvm_context: context,
         }
     }
 
     pub fn new() -> Context {
         let context = unsafe { LLVMContextCreate() };
         Context {
-            llvm_context: context
+            llvm_context: context,
         }
     }
 
     pub fn from_module(module: LLVMModuleRef) -> Context {
         let context = unsafe { LLVMGetModuleContext(module) };
         Context {
-            llvm_context: context
+            llvm_context: context,
         }
     }
 
@@ -53,6 +53,11 @@ impl Context {
     //
     // get Type
     //
+    #[inline]
+    pub fn ArrayType(&self, typ: LLVMTypeRef, count: u32) -> LLVMTypeRef {
+        unsafe { LLVMArrayType(typ, count) }
+    }
+
     #[inline]
     pub fn StructTypeNamed(&self, name: &str) -> Struct {
         Struct::new_with_name(self.llvm_context, name)
@@ -238,5 +243,14 @@ impl Context {
     #[inline]
     pub fn PPCFP128(&self, val: f64) -> LLVMValueRef {
         unsafe { LLVMConstReal(LLVMPPCFP128TypeInContext(self.llvm_context), val) }
+    }
+    #[inline]
+    pub fn ConstArray(
+        &self,
+        typ: LLVMTypeRef,
+        vals: &mut Vec<LLVMValueRef>,
+        len: u32,
+    ) -> LLVMValueRef {
+        unsafe { LLVMConstArray(typ, vals.as_mut_ptr(), len) }
     }
 }
