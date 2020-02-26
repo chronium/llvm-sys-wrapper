@@ -1211,6 +1211,70 @@ impl Builder {
     pub fn build_phi_with_name(&self, typ: LLVMTypeRef, name: &str) -> Phi {
         Phi::new(self.llvm_builder, typ, name)
     }
+
+    #[inline]
+    pub fn build_si_to_fp(&self, val: LLVMValueRef, typ: LLVMTypeRef) -> LLVMValueRef {
+        self.build_si_to_fp_with_name(val, typ, "")
+    }
+
+    #[inline]
+    pub fn build_ui_to_fp(&self, val: LLVMValueRef, typ: LLVMTypeRef) -> LLVMValueRef {
+        self.build_ui_to_fp_with_name(val, typ, "")
+    }
+
+    #[inline]
+    pub fn build_si_to_fp_with_name(
+        &self,
+        val: LLVMValueRef,
+        typ: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildSIToFP(self.llvm_builder, val, typ, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_ui_to_fp_with_name(
+        &self,
+        val: LLVMValueRef,
+        typ: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildUIToFP(self.llvm_builder, val, typ, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fp_to_si(&self, val: LLVMValueRef, typ: LLVMTypeRef) -> LLVMValueRef {
+        self.build_fp_to_si_with_name(val, typ, "")
+    }
+
+    #[inline]
+    pub fn build_fp_to_ui(&self, val: LLVMValueRef, typ: LLVMTypeRef) -> LLVMValueRef {
+        self.build_fp_to_ui_with_name(val, typ, "")
+    }
+
+    #[inline]
+    pub fn build_fp_to_si_with_name(
+        &self,
+        val: LLVMValueRef,
+        typ: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFPToSI(self.llvm_builder, val, typ, val_name_ptr) }
+    }
+
+    #[inline]
+    pub fn build_fp_to_ui_with_name(
+        &self,
+        val: LLVMValueRef,
+        typ: LLVMTypeRef,
+        name: &str,
+    ) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildFPToUI(self.llvm_builder, val, typ, val_name_ptr) }
+    }
 }
 
 impl Drop for Builder {
