@@ -100,7 +100,8 @@ impl Builder {
         index: u32,
         name: &str,
     ) -> LLVMValueRef {
-        unsafe { LLVMBuildStructGEP(self.llvm_builder, ptr, index, name.as_ptr() as *const i8) }
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildStructGEP(self.llvm_builder, ptr, index, val_name_ptr) }
     }
 
     #[inline]
