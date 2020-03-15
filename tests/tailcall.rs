@@ -7,7 +7,6 @@
 //
 // If you read 'tailcall.s', you can look that tail calling function changed to jump operation.
 
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
@@ -25,7 +24,7 @@ fn test_tailcall() {
     let module = context.create_module("tailcall");
 
     // declare printf function
-    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.get_or_add_function("printf", printf_type);
 
     //
@@ -86,7 +85,7 @@ fn test_tailcall() {
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
@@ -15,13 +14,13 @@ fn main() {
     //
     // declare printf function
     //
-    let printf_type = fn_type!(ctx.Int32Type(), ctx.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(ctx.Int32Type(), ctx.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.add_function("printf", printf_type);
 
     //
     // declare fib function
     //
-    let fun_type = fn_type!(ctx.Int64Type(), ctx.Int64Type());    // Int32 fib(Int32)
+    let fun_type = fn_type!(ctx.Int64Type(), ctx.Int64Type()); // Int32 fib(Int32)
     let fib_func = module.add_function("fib", fun_type);
     let entry_block = fib_func.append_basic_block("entry");
     builder.position_at_end(entry_block);
@@ -94,10 +93,10 @@ fn main() {
             let ret = module.print_module_to_file(filename);
             if let Err(msg) = ret {
                 println!("Error: {}", msg);
-            }else{
+            } else {
                 println!("success compile to file '{}'.", filename);
             }
-        },
+        }
         Err(msg) => panic!("Error: {}", msg),
     }
 }

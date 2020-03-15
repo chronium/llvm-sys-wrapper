@@ -1,10 +1,10 @@
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
 
 #[test]
-fn test_puts() {    // 参考: [llvm で Hello wolrd!! 〜llvm入門 その2〜](http://blog.64p.org/entry/2012/07/18/172418)
+fn test_puts() {
+    // 参考: [llvm で Hello wolrd!! 〜llvm入門 その2〜](http://blog.64p.org/entry/2012/07/18/172418)
     LLVM::initialize();
 
     // create context
@@ -32,7 +32,7 @@ fn test_puts() {    // 参考: [llvm で Hello wolrd!! 〜llvm入門 その2〜]
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

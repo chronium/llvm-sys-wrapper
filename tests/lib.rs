@@ -1,11 +1,11 @@
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
-use LLVM::{Type, Const};
+use LLVM::{Const, Type};
 
 #[test]
-fn it_works() {    // 参考: [Go言語で利用するLLVM入門](https://postd.cc/an-introduction-to-llvm-in-go/)
+fn it_works() {
+    // 参考: [Go言語で利用するLLVM入門](https://postd.cc/an-introduction-to-llvm-in-go/)
     LLVM::initialize();
 
     // setup our builder and module
@@ -37,7 +37,7 @@ fn it_works() {    // 参考: [Go言語で利用するLLVM入門](https://postd.
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

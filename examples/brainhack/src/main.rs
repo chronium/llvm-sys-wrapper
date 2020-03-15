@@ -6,7 +6,6 @@
 //
 // 参考： [LLVM APIを使ってみよう！ 〜 Brainf**kコンパイラをIRBuilderで書き直してみた 〜](http://itchyny.hatenablog.com/entry/2017/03/06/100000)
 
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
@@ -19,7 +18,7 @@ struct Compiler {
     module: Module,
     buffer: LLVMValueRef,
     ptr: LLVMValueRef,
-    main_func: Function
+    main_func: Function,
 }
 
 impl Compiler {
@@ -35,7 +34,11 @@ impl Compiler {
         builder.position_at_end(entry_block);
 
         // setup calloc function
-        let calloc_type = fn_type!(context.Int8PointerType(), context.Int64Type(), context.Int64Type());
+        let calloc_type = fn_type!(
+            context.Int8PointerType(),
+            context.Int64Type(),
+            context.Int64Type()
+        );
         let calloc_func = module.get_or_add_function("calloc", calloc_type);
 
         // setup memory
@@ -54,11 +57,11 @@ impl Compiler {
             module: module,
             buffer: data,
             ptr: ptr,
-            main_func: main_function
+            main_func: main_function,
         }
     }
 
-    fn end_emit(&self){
+    fn end_emit(&self) {
         // setup free function
         let free_type = fn_type!(self.ctx.VoidType(), self.ctx.Int8PointerType());
         let free_func = self.module.get_or_add_function("free", free_type);
@@ -71,30 +74,34 @@ impl Compiler {
         let _ret = self.builder.build_ret_void();
     }
 
-    fn emit_move_ptr(&self, diff: i64){
+    fn emit_move_ptr(&self, diff: i64) {
         let mut indices = [self.ctx.SInt32(diff as u64)];
-        let gep = self.builder.build_inbounds_gep(self.builder.build_load(self.ptr), &mut indices);
+        let gep = self
+            .builder
+            .build_inbounds_gep(self.builder.build_load(self.ptr), &mut indices);
         self.builder.build_store(gep, self.ptr);
     }
 
-    fn emit_add(&self, diff: i64){
+    fn emit_add(&self, diff: i64) {
         let tmp = self.builder.build_load(self.ptr);
-        let add = self.builder.build_add(self.builder.build_load(tmp), self.ctx.SInt8(diff as u64));
+        let add = self
+            .builder
+            .build_add(self.builder.build_load(tmp), self.ctx.SInt8(diff as u64));
         self.builder.build_store(add, tmp);
     }
 
-    fn emit_put(&self){
+    fn emit_put(&self) {
         // setup putchar function
         let putchar_type = fn_type!(self.ctx.Int32Type(), self.ctx.Int32Type());
         let putchar_func = self.module.get_or_add_function("putchar", putchar_type);
 
-        let val = self.builder.build_load( self.builder.build_load(self.ptr) );
+        let val = self.builder.build_load(self.builder.build_load(self.ptr));
         let ext_val = self.builder.build_sext(val, self.ctx.Int32Type());
         let mut args = [ext_val];
         let _call = self.builder.build_call(putchar_func.as_ref(), &mut args);
     }
 
-    fn emit_while_start(&self, chars: &mut std::str::Chars){
+    fn emit_while_start(&self, chars: &mut std::str::Chars) {
         let cond_block = self.main_func.append_basic_block("while_cond");
         let body_block = self.main_func.append_basic_block("while_body");
         let end_block = self.main_func.append_basic_block("while_end");
@@ -102,7 +109,7 @@ impl Compiler {
         self.builder.build_br(cond_block);
         self.builder.position_at_end(cond_block);
 
-        let load = self.builder.build_load( self.builder.build_load(self.ptr) );
+        let load = self.builder.build_load(self.builder.build_load(self.ptr));
         let cond = self.builder.build_icmp_ne(load, self.ctx.UInt8(0));
         self.builder.build_cond_br(cond, body_block, end_block);
         self.builder.position_at_end(body_block);
@@ -113,7 +120,7 @@ impl Compiler {
         self.builder.position_at_end(end_block);
     }
 
-    fn dump(&self){
+    fn dump(&self) {
         match self.module.verify() {
             Ok(_) => self.module.dump(),
             Err(msg) => panic!("Error: {}", msg),
@@ -121,7 +128,7 @@ impl Compiler {
     }
 
     #[allow(dead_code)]
-    fn run(&self){
+    fn run(&self) {
         match self.module.verify() {
             Ok(_) => {
                 let interperter = self.module.create_interpreter().unwrap();
@@ -129,12 +136,12 @@ impl Compiler {
                 let mut params = [];
                 let run_result = interperter.run_function(named_function.as_ref(), &mut params);
                 let _ = run_result.to_int();
-            },
-            Err(msg) => panic!("Error: {}", msg)
+            }
+            Err(msg) => panic!("Error: {}", msg),
         }
     }
 
-    fn compile(&self, chars: &mut std::str::Chars){
+    fn compile(&self, chars: &mut std::str::Chars) {
         while let Some(ch) = chars.next() {
             match ch {
                 '>' => self.emit_move_ptr(1),

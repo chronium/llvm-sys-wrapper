@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
@@ -26,7 +25,7 @@ fn test_printf() {
     let world = builder.build_global_string_ptr("world!");
 
     // setup printf function
-    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.add_function("printf", printf_type);
 
     // call printf function
@@ -37,7 +36,7 @@ fn test_printf() {
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

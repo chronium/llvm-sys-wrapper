@@ -1,6 +1,5 @@
-#[macro_use]
-extern crate llvm_sys_wrapper;
 extern crate llvm_sys;
+extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
 
@@ -27,7 +26,7 @@ fn test_interpret() {
     let world = builder.build_global_string_ptr_with_name("Interpreter!", "world");
 
     // setup printf function
-    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.add_function("printf", printf_type);
 
     // call printf function
@@ -46,7 +45,7 @@ fn test_interpret() {
             let mut params = [];
             let run_result = interperter.run_function(named_function.as_ref(), &mut params);
             let _ = run_result.to_int();
-        },
-        Err(msg) => panic!("Error: {}", msg)
+        }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

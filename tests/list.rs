@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate llvm_sys_wrapper;
 
 use llvm_sys_wrapper::*;
@@ -35,7 +34,7 @@ fn test_list() {
     let str_rparen = builder.build_global_string_ptr(")\n");
 
     // declare printf function
-    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.add_function("printf", printf_type);
 
     //
@@ -57,14 +56,17 @@ fn test_list() {
         builder.build_store(builder.build_inbounds_gep(buf, &mut args), ptr);
 
         // // ptr.value = i
-        builder.build_store(builder.build_struct_gep(builder.build_load(ptr), 0), i32_ptr);
+        builder.build_store(
+            builder.build_struct_gep(builder.build_load(ptr), 0),
+            i32_ptr,
+        );
         builder.build_store(context.SInt32(i as u64), builder.build_load(i32_ptr));
 
         // // ptr.next = next pointer
         let tmp = builder.build_struct_gep(builder.build_load(ptr), 1);
         if i == 4 {
             builder.build_store(null_pointer, tmp);
-        }else{
+        } else {
             let mut args = [context.UInt32(i + 1 as u64)];
             builder.build_store(builder.build_inbounds_gep(buf, &mut args), next_ptr);
             builder.build_store(builder.build_load(next_ptr), tmp);
@@ -93,7 +95,10 @@ fn test_list() {
     builder.position_at_end(loop_block);
 
     // loop start
-    builder.build_store(builder.build_struct_gep(builder.build_load(ptr), 0), i32_ptr);
+    builder.build_store(
+        builder.build_struct_gep(builder.build_load(ptr), 0),
+        i32_ptr,
+    );
     let val = builder.build_load(builder.build_load(i32_ptr));
     let mut args = [fmt_num, val];
     builder.build_call(printf_func.as_ref(), &mut args);
@@ -120,13 +125,12 @@ fn test_list() {
     let mut args = [str_rparen];
     builder.build_call(printf_func.as_ref(), &mut args);
 
-
     // ret void
     let _ret = builder.build_ret_void();
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }
