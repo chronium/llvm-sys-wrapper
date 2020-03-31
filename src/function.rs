@@ -6,7 +6,7 @@ use self::llvm_sys::core::*;
 use self::llvm_sys::prelude::*;
 use cstring_manager::CStringManager;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Function {
     llvm_function: LLVMValueRef,
     llvm_module: LLVMModuleRef,
@@ -20,7 +20,7 @@ impl Function {
         Function {
             llvm_function: function,
             llvm_module: module,
-            function_type: function_type
+            function_type: function_type,
         }
     }
 
@@ -36,7 +36,7 @@ impl Function {
         let label_name_ptr = CStringManager::new_cstring_as_ptr(name);
         if self.llvm_module.is_null() {
             unsafe { LLVMAppendBasicBlock(self.llvm_function, label_name_ptr) }
-        }else{
+        } else {
             let context = unsafe { LLVMGetModuleContext(self.llvm_module) };
             unsafe { LLVMAppendBasicBlockInContext(context, self.llvm_function, label_name_ptr) }
         }
@@ -68,7 +68,7 @@ impl Function {
 
     #[inline]
     pub fn get_param_types(&self) -> LLVMTypeRef {
-        let mut types : LLVMTypeRef = 0 as LLVMTypeRef;
+        let mut types: LLVMTypeRef = 0 as LLVMTypeRef;
         let ptr: *mut LLVMTypeRef = &mut types;
         unsafe {
             LLVMGetParamTypes(self.function_type, ptr);
