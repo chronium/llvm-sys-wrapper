@@ -1,40 +1,126 @@
-extern crate llvm_sys;
 extern crate libc;
+extern crate llvm_sys;
 
 mod builder;
-mod module;
-mod function;
 mod context;
+mod cstring_manager;
 mod engine;
+mod function;
+mod module;
 mod phi;
 mod struct_type;
-mod cstring_manager;
 
+pub use self::builder::Builder;
+pub use self::context::Context;
+pub use self::engine::{Engine, FuncallResult};
+pub use self::function::Function;
 pub use self::llvm_sys::core::*;
 pub use self::llvm_sys::prelude::*;
-pub use self::builder::Builder;
-pub use self::module::Module;
-pub use self::function::Function;
-pub use self::context::Context;
-pub use self::phi::Phi;
-pub use self::engine::{Engine, FuncallResult};
-pub use self::struct_type::Struct;
 pub use self::llvm_sys::*;
+pub use self::module::Module;
+pub use self::phi::Phi;
+pub use self::struct_type::Struct;
+use llvm_sys::target_machine::LLVMCodeGenOptLevel;
+
+pub enum CPU {
+    Native,
+    X86_64,
+    I686,
+}
+
+use std::ffi::CString;
+impl From<CPU> for CString {
+    fn from(cpu: CPU) -> CString {
+        match cpu {
+            CPU::Native => CString::new("native").expect(""),
+            CPU::X86_64 => CString::new("x86-64").expect(""),
+            CPU::I686 => CString::new("i686").expect(""),
+        }
+    }
+}
+
+pub enum CodegenLevel {
+    O0,
+    O1,
+    O2,
+    O3,
+}
+
+impl From<CodegenLevel> for LLVMCodeGenOptLevel {
+    fn from(level: CodegenLevel) -> LLVMCodeGenOptLevel {
+        match level {
+            CodegenLevel::O0 => LLVMCodeGenOptLevel::LLVMCodeGenLevelNone,
+            CodegenLevel::O1 => LLVMCodeGenOptLevel::LLVMCodeGenLevelLess,
+            CodegenLevel::O2 => LLVMCodeGenOptLevel::LLVMCodeGenLevelDefault,
+            CodegenLevel::O3 => LLVMCodeGenOptLevel::LLVMCodeGenLevelAggressive,
+        }
+    }
+}
 
 #[allow(non_snake_case)]
 pub mod LLVM {
     use llvm_sys::core::*;
-    use llvm_sys::target;
     use llvm_sys::prelude::*;
+    use llvm_sys::target;
+    use llvm_sys::target_machine::*;
+    use module::Module;
+    use std::ffi::CStr;
+    use std::ffi::CString;
     use std::os::raw::c_uint;
+    use std::ptr;
+    use CodegenLevel;
+    use CPU;
 
-    pub fn initialize(){
+    pub fn initialize() {
         unsafe {
             if target::LLVM_InitializeNativeTarget() != 0 {
                 panic!("Could not initialise target");
             }
             if target::LLVM_InitializeNativeAsmPrinter() != 0 {
                 panic!("Could not initialise ASM Printer");
+            }
+        }
+    }
+
+    pub fn emit(
+        module: &Module,
+        opt_level: CodegenLevel,
+        out: String,
+        cpu: CPU,
+    ) -> Result<(), String> {
+        let features = CString::new("").expect("");
+        let cpu: CString = cpu.into();
+        let out = CString::new(out).expect("");
+        unsafe {
+            let triple = LLVMGetDefaultTargetTriple();
+            let target = LLVMGetFirstTarget();
+            let reloc_mode = LLVMRelocMode::LLVMRelocDefault;
+            let code_model = LLVMCodeModel::LLVMCodeModelDefault;
+            let target_machine = LLVMCreateTargetMachine(
+                target,
+                triple,
+                cpu.as_ptr(),
+                features.as_ptr(),
+                opt_level.into(),
+                reloc_mode,
+                code_model,
+            );
+            let file_type = LLVMCodeGenFileType::LLVMObjectFile;
+
+            let mut err_str = ptr::null_mut();
+            let res = LLVMTargetMachineEmitToFile(
+                target_machine,
+                module.as_ref(),
+                out.as_ptr() as *mut i8,
+                file_type,
+                &mut err_str,
+            );
+
+            if res == 1 {
+                let err = CStr::from_ptr(err_str);
+                Err(err.to_string_lossy().into_owned())
+            } else {
+                Ok(())
             }
         }
     }
