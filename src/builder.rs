@@ -496,7 +496,7 @@ impl Builder {
 
     #[inline]
     pub fn build_and(&self, lhs: LLVMValueRef, rhs: LLVMValueRef) -> LLVMValueRef {
-        self.build_add_with_name(lhs, rhs, "")
+        self.build_and_with_name(lhs, rhs, "")
     }
 
     #[inline]
