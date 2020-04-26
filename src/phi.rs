@@ -6,16 +6,14 @@ use cstring_manager::CStringManager;
 
 #[derive(Debug)]
 pub struct Phi {
-    llvm_phi: LLVMValueRef
+    llvm_phi: LLVMValueRef,
 }
 
 impl Phi {
     pub fn new(builder: LLVMBuilderRef, typ: LLVMTypeRef, name: &str) -> Phi {
         let name_ptr = CStringManager::new_cstring_as_ptr(name);
         let phi = unsafe { LLVMBuildPhi(builder, typ, name_ptr) };
-        Phi {
-            llvm_phi: phi
-        }
+        Phi { llvm_phi: phi }
     }
 
     pub fn as_ref(&self) -> LLVMValueRef {
@@ -23,20 +21,25 @@ impl Phi {
     }
 
     #[inline]
-    pub fn add_incoming(&self, value: LLVMValueRef, block: LLVMBasicBlockRef){
+    pub fn add_incoming(&self, value: LLVMValueRef, block: LLVMBasicBlockRef) {
         let mut values = [value];
         let mut blocks = [block];
         self.add_incomings(&mut values, &mut blocks);
     }
 
     #[inline]
-    pub fn add_incomings(&self, values: &mut [LLVMValueRef], blocks: &mut [LLVMBasicBlockRef]){
+    pub fn add_incomings(&self, values: &mut [LLVMValueRef], blocks: &mut [LLVMBasicBlockRef]) {
         let count = values.len();
         if count != blocks.len() {
             panic!("values count not equal blocks count.");
         }
         unsafe {
-            LLVMAddIncoming(self.llvm_phi, values.as_mut_ptr(), blocks.as_mut_ptr(), count as u32)
+            LLVMAddIncoming(
+                self.llvm_phi,
+                values.as_mut_ptr(),
+                blocks.as_mut_ptr(),
+                count as u32,
+            )
         }
     }
 

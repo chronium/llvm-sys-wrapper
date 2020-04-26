@@ -20,7 +20,7 @@ fn test_array_alloca() {
     builder.position_at_end(entry_block);
 
     // setup printf function
-    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,);  // Int32 printf(CharPointer, ...)
+    let printf_type = fn_type!(context.Int32Type(), context.CharPointerType() ,,,); // Int32 printf(CharPointer, ...)
     let printf_func = module.add_function("printf", printf_type);
 
     // alloca
@@ -34,32 +34,50 @@ fn test_array_alloca() {
     builder.build_store(context.UInt8('H' as u64), tmp);
 
     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('e' as u64), tmp);
 
-     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    let mut args = [context.SInt32(1)];
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('l' as u64), tmp);
 
-     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    let mut args = [context.SInt32(1)];
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('l' as u64), tmp);
 
-     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    let mut args = [context.SInt32(1)];
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('o' as u64), tmp);
 
-     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    let mut args = [context.SInt32(1)];
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('\n' as u64), tmp);
 
-     let mut args = [context.SInt32(1)];
-    builder.build_store(builder.build_inbounds_gep(builder.build_load(ptr), &mut args), ptr);
+    let mut args = [context.SInt32(1)];
+    builder.build_store(
+        builder.build_inbounds_gep(builder.build_load(ptr), &mut args),
+        ptr,
+    );
     let tmp = builder.build_load(ptr);
     builder.build_store(context.UInt8('\0' as u64), tmp);
 
@@ -72,7 +90,7 @@ fn test_array_alloca() {
 
     // verify & dump
     match module.verify() {
-        Ok(_) => { /* module.dump() */ },
-        Err(msg) => panic!("Error: {}", msg)
+        Ok(_) => { /* module.dump() */ }
+        Err(msg) => panic!("Error: {}", msg),
     }
 }

@@ -1,16 +1,16 @@
-extern crate llvm_sys;
 extern crate libc;
+extern crate llvm_sys;
 
-use self::llvm_sys::prelude::*;
-use self::llvm_sys::execution_engine::*;
-use std::ffi::CString;
-use std::os::raw::{c_char, c_ulonglong, c_uint};
 use self::libc::c_void;
+use self::llvm_sys::execution_engine::*;
+use self::llvm_sys::prelude::*;
+use std::ffi::CString;
+use std::os::raw::{c_char, c_uint, c_ulonglong};
 use LLVM::Type;
 
 #[derive(Debug)]
 pub struct Engine {
-    llvm_execute_engine: LLVMExecutionEngineRef
+    llvm_execute_engine: LLVMExecutionEngineRef,
 }
 
 impl Engine {
@@ -22,15 +22,16 @@ impl Engine {
             let engine_ref: *mut LLVMExecutionEngineRef = &mut engine;
             LLVMLinkInInterpreter();
             LLVMCreateInterpreterForModule(engine_ref, module, buf)
-        };        
+        };
 
-        if result == 1 { // error
+        if result == 1 {
+            // error
             let err_msg = unsafe { CString::from_raw(error).into_string().unwrap() };
             Err(err_msg)
-
-        }else{           // ok
+        } else {
+            // ok
             Ok(Engine {
-                llvm_execute_engine: engine
+                llvm_execute_engine: engine,
             })
         }
     }
@@ -42,16 +43,23 @@ impl Engine {
             let buf: *mut *mut c_char = &mut error;
             let engine_ref: *mut LLVMExecutionEngineRef = &mut engine;
             LLVMLinkInMCJIT();
-            LLVMCreateMCJITCompilerForModule(engine_ref, module, 0 as *mut LLVMMCJITCompilerOptions, 0, buf)
-        };        
+            LLVMCreateMCJITCompilerForModule(
+                engine_ref,
+                module,
+                0 as *mut LLVMMCJITCompilerOptions,
+                0,
+                buf,
+            )
+        };
 
-        if result == 1 { // error
+        if result == 1 {
+            // error
             let err_msg = unsafe { CString::from_raw(error).into_string().unwrap() };
             Err(err_msg)
-
-        }else{           // ok
+        } else {
+            // ok
             Ok(Engine {
-                llvm_execute_engine: engine
+                llvm_execute_engine: engine,
             })
         }
     }
@@ -60,21 +68,30 @@ impl Engine {
         self.llvm_execute_engine
     }
 
-    pub fn run_function(&self, function: LLVMValueRef, args: &mut [LLVMGenericValueRef]) -> FuncallResult {
-        let func_result = unsafe { LLVMRunFunction(self.llvm_execute_engine, function, args.len() as u32, args.as_mut_ptr()) };
+    pub fn run_function(
+        &self,
+        function: LLVMValueRef,
+        args: &mut [LLVMGenericValueRef],
+    ) -> FuncallResult {
+        let func_result = unsafe {
+            LLVMRunFunction(
+                self.llvm_execute_engine,
+                function,
+                args.len() as u32,
+                args.as_mut_ptr(),
+            )
+        };
         FuncallResult::new(func_result)
     }
 }
 
 pub struct FuncallResult {
-    value: LLVMGenericValueRef
+    value: LLVMGenericValueRef,
 }
 
 impl FuncallResult {
     pub fn new(val: LLVMGenericValueRef) -> FuncallResult {
-        FuncallResult {
-            value: val
-        }
+        FuncallResult { value: val }
     }
 
     pub fn as_ref(&self) -> LLVMGenericValueRef {
