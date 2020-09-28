@@ -68,6 +68,17 @@ impl Builder {
     }
 
     #[inline]
+    pub fn build_malloc(&self, typ: LLVMTypeRef) -> LLVMValueRef {
+        self.build_malloc_with_name(typ, "")
+    }
+
+    #[inline]
+    pub fn build_malloc_with_name(&self, typ: LLVMTypeRef, name: &str) -> LLVMValueRef {
+        let val_name_ptr = CStringManager::new_cstring_as_ptr(name);
+        unsafe { LLVMBuildMalloc(self.llvm_builder, typ, val_name_ptr) }
+    }
+
+    #[inline]
     pub fn build_array_malloc(&self, typ: LLVMTypeRef, size: LLVMValueRef) -> LLVMValueRef {
         self.build_array_malloc_with_name(typ, size, "")
     }
